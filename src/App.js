@@ -16,8 +16,10 @@ export default function App() {
     setLoading(true);
     fetch(baseURL + 'users.json')
       .then((response) => response.json())
-      .then((data) => setList((prevState) => [...prevState, ...data]));
-    setLoading(false);
+      .then((data) => setList((prevState) => [...prevState, ...data]))
+      .then(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -36,7 +38,6 @@ export default function App() {
   }, [userID]);
 
   const getUserIdHandler = (id) => {
-    setUserID(id);
     setList((prevState) => {
       const newState = prevState.map((item) => {
         item.id === id ? (item.active = true) : (item.active = false);
@@ -44,17 +45,20 @@ export default function App() {
       });
       return newState;
     });
+    setUserID(id);
   };
 
   return (
     <div className='wrapper'>
       <div className='container'>
         <div className='container_column'>
-          {loading && <Loading />}
-          {!loading && <List list={list} getUserIdHandler={getUserIdHandler} />}
+          {loading && !list.length && <Loading />}
+          {list.length && (
+            <List list={list} getUserIdHandler={getUserIdHandler} />
+          )}
         </div>
         <div className='container_column'>
-          {loading && <Loading />}
+          {userID && loading && <Loading />}
           {!loading && userInfo && <Details userInfo={userInfo} />}
         </div>
       </div>
